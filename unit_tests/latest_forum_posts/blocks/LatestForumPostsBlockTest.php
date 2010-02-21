@@ -1,6 +1,6 @@
 <?php
 
-define('CPG_NUKE', '10');
+//define('CPG_NUKE', '10');
 require_once dirname(__FILE__).'/../../../latest_forum_posts/blocks/LatestForumPostsBlock.php';
 
 class LatestForumPostsBlockTest extends PHPUnit_Framework_TestCase {
