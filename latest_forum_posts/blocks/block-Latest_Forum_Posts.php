@@ -72,8 +72,6 @@ DESC LIMIT '.$count);
             $post_date = MB::tolower(formatDateTime($row['post_time'], '%d. %b'));
             $post_time = formatDateTime($row['post_time'], '%T');
 
-            //echo '<!-- timenow: '.current_time().' post_time: '.$row['post_time'].' -->';
-
             $post_time_ago = getTimeAgo($row['post_time'], dfTime());
 
             $new_post = 0;
