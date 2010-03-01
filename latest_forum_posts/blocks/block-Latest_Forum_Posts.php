@@ -31,6 +31,8 @@ if (!is_active('Forums')) {
     return trigger_error('Forums module is inactive. Please activate the Forums in order to use this block.', E_USER_WARNING);
 } else {
 
+    get_lang('latest_forum_posts');
+
     //How many topics would you like to show?
     $count = 8;
 
@@ -41,7 +43,7 @@ if (!is_active('Forums')) {
         //$query_restriction = ' AND (f.auth_view < 2 || f.auth_read < 2)';
     }
 
-        //Main query
+    //Main query
     $result = $db->sql_query('SELECT
 t.topic_id AS topic_id, t.forum_id AS forum_id, t.topic_title AS topic_title,
 t.topic_replies AS topic_replies, t.topic_last_post_id AS topic_last_post_id,
@@ -55,7 +57,7 @@ WHERE t.forum_id=f.forum_id'.$query_restriction.'
 ORDER BY t.topic_last_post_id
 DESC LIMIT '.$count);
 
-        //Check if at least one Topic exists and say if isn't
+    //Check if at least one Topic exists and say if isn't
     if ($db->sql_numrows($result) < 1) {
         $content = _ERROR;
         return trigger_error('There are no forum posts', E_USER_NOTICE);
@@ -106,13 +108,13 @@ DESC LIMIT '.$count);
     }
 
 
-        //Uncomment this, if you need translated strings:
-        /*
-        $cpgtpl->assign_vars(array(
-          'S_REPLIES'         => $lang['Replies'],
-          'S_LAST_POST'       => $lang['Last_Post']
-        ));
-        */
+    //Uncomment this, if you need translated strings:
+    /*
+    $cpgtpl->assign_vars(array(
+      'S_REPLIES'         => $lang['Replies'],
+      'S_LAST_POST'       => $lang['Last_Post']
+    ));
+    */
 
     ob_start();
     $cpgtpl->set_filenames(array('template' => 'blocks/latest_forum_posts.html'));
@@ -126,61 +128,47 @@ function getTimeAgo($datefrom, $dateto=-1) {
     // Defaults and assume if 0 is passed in that
     // its an error rather than the epoch
 
-    if($datefrom<=0) { return "A long time ago"; }
-    if($dateto==-1) { $dateto = time(); }
+    if ($datefrom<=0) { return _LONG_TIME_AGO; }
+    if ($dateto==-1) { $dateto = time(); }
 
-        // Calculate the difference in seconds betweeen
-        // the two timestamps
+    // Calculate the difference in seconds betweeen
+    // the two timestamps
 
     $difference = $dateto - $datefrom;
 
-        // If difference is less than 60 seconds,
-        // seconds is a good interval of choice
+    // If difference is less than 60 seconds,
+    // seconds is a good interval of choice
 
-    if($difference < 60)
-    {
+    if ($difference < 60) {
         $interval = "s";
-    }
 
         // If difference is between 60 seconds and
         // 60 minutes, minutes is a good interval
-    elseif($difference >= 60 && $difference<60*60)
-    {
+    } elseif($difference >= 60 && $difference<60*60) {
         $interval = "n";
-    }
 
         // If difference is between 1 hour and 24 hours
         // hours is a good interval
-    elseif($difference >= 60*60 && $difference<60*60*24)
-    {
+    } elseif ($difference >= 60*60 && $difference<60*60*24) {
         $interval = "h";
-    }
 
         // If difference is between 1 day and 7 days
         // days is a good interval
-    elseif($difference >= 60*60*24 && $difference<60*60*24*7)
-    {
+    } elseif ($difference >= 60*60*24 && $difference<60*60*24*7) {
         $interval = "d";
-    }
 
         // If difference is between 1 week and 30 days
         // weeks is a good interval
-    elseif($difference >= 60*60*24*7 && $difference <
-    60*60*24*30)
-    {
+    } elseif ($difference >= 60*60*24*7 && $difference < 60*60*24*30) {
         $interval = "ww";
-    }
 
         // If difference is between 30 days and 365 days
         // months is a good interval, again, the same thing
         // applies, if the 29th February happens to exist
         // between your 2 dates, the function will return
         // the 'incorrect' value for a day
-    elseif($difference >= 60*60*24*30 && $difference <
-    60*60*24*365)
-    {
+    } elseif ($difference >= 60*60*24*30 && $difference < 60*60*24*365) {
         $interval = "m";
-    }
 
         // If difference is greater than or equal to 365
         // days, return year. This will be incorrect if
@@ -188,72 +176,70 @@ function getTimeAgo($datefrom, $dateto=-1) {
         // 2008 passing in 29th April 2007. It will return
         // 1 year ago when in actual fact (yawn!) not quite
         // a year has gone by
-    elseif($difference >= 60*60*24*365)
-    {
+    } elseif($difference >= 60*60*24*365) {
         $interval = "y";
     }
 
-        // Based on the interval, determine the
-        // number of units between the two dates
-        // From this point on, you would be hard
-        // pushed telling the difference between
-        // this function and DateDiff. If the $datediff
-        // returned is 1, be sure to return the singular
-        // of the unit, e.g. 'day' rather 'days'
+    // Based on the interval, determine the
+    // number of units between the two dates
+    // From this point on, you would be hard
+    // pushed telling the difference between
+    // this function and DateDiff. If the $datediff
+    // returned is 1, be sure to return the singular
+    // of the unit, e.g. 'day' rather 'days'
 
-    switch($interval)
-    {
+    switch($interval) {
         case "m":
             $months_difference = floor($difference / 60 / 60 / 24 /
                     29);
             while (mktime(date("H", $datefrom), date("i", $datefrom),
-            date("s", $datefrom), date("n", $datefrom)+($months_difference),
-            date("j", $dateto), date("Y", $datefrom)) < $dateto)
+                date("s", $datefrom), date("n", $datefrom)+($months_difference),
+                date("j", $dateto), date("Y", $datefrom)) < $dateto)
             {
                 $months_difference++;
             }
             $datediff = $months_difference;
 
-                // We need this in here because it is possible
-                // to have an 'm' interval and a months
-                // difference of 12 because we are using 29 days
-                // in a month
+            // We need this in here because it is possible
+            // to have an 'm' interval and a months
+            // difference of 12 because we are using 29 days
+            // in a month
 
             if ($datediff==12) {
                 $datediff--;
             }
 
-            $res = ($datediff==1) ? "$datediff month ago" : "$datediff months ago";
+            $res = ($datediff==1) ? _ONE_MONTH_AGO : sprintf(_MONTHS_AGO, $datediff);
             break;
 
         case "y":
             $datediff = floor($difference / 60 / 60 / 24 / 365);
-            $res = ($datediff==1) ? "$datediff year ago" : "$datediff years ago";
+            $res = ($datediff==1) ? _ONE_YEAR_AGO : sprintf(_YEARS_AGO, $datediff);
             break;
 
         case "d":
             $datediff = floor($difference / 60 / 60 / 24);
-            $res = ($datediff==1) ? "$datediff day ago" : "$datediff days ago";
+            $res = ($datediff==1) ? _ONE_DAY_AGO : sprintf(_DAYS_AGO, $datediff);
             break;
 
         case "ww":
             $datediff = floor($difference / 60 / 60 / 24 / 7);
-            $res = ($datediff==1) ? "$datediff week ago" : "$datediff weeks ago";
+            $res = ($datediff==1) ? _ONE_WEEK_AGO : sprintf(_WEEKS_AGO, $datediff);
             break;
 
         case "h":
             $datediff = floor($difference / 60 / 60);
-            $res = ($datediff==1) ? "$datediff hour ago" : "$datediff hours ago";
+            $res = ($datediff==1) ? _ONE_HOUR_AGO : sprintf(_HOURS_AGO, $datediff);
             break;
 
         case "n":
             $datediff = floor($difference / 60);
-            $res = ($datediff==1) ? "$datediff minute ago" : "$datediff minutes ago";
+            $res = ($datediff==1) ? _ONE_MINUTE_AGO : sprintf(_MINUTES_AGO, $datediff);
             break;
 
         case "s":
             $datediff = $difference;
-            $res = ($datediff==1) ? "$datediff second ago" : "$datediff seconds ago";
+            $res = ($datediff==1) ? _ONE_SECOND_AGO : sprintf(_SECONDS_AGO, $datediff);
             break;
     }
     return $res;
