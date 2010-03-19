@@ -20,7 +20,14 @@ Encoding test: n-array summation ∑ latin ae w/ acute ǽ
 
 if (!defined('CPG_NUKE')) { exit; }
 require_once('AbstractBlocksModule.php');
+require_once('AbstractBlocksException.php');
 
-$abstractBlocksModule = new AbstractBlocksModule();
-$abstractBlocksModule->showHeader();
-$abstractBlocksModule->showHello();
+
+try {
+    $abstractBlocksModule = new AbstractBlocksModule();
+    $abstractBlocksModule->showHeader();
+    $abstractBlocksModule->showHello();
+//todo: some of it shouldn't be caught here, but separately for each blocks    
+} catch (AbstractBlocksException $abe) {
+    echo 'something went wrong';
+}
