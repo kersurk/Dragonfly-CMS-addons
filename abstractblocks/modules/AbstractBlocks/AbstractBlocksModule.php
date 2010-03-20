@@ -5,6 +5,9 @@
  * Time: 16:43:28
  */
 
+require_once('AbstractBlocksBlock.php');
+require_once('AbstractBlocksBlockException.php');
+
 class AbstractBlocksModule {
 
     private static $types = array('file', 'custom');
@@ -21,44 +24,41 @@ class AbstractBlocksModule {
         echo 'Hello';
     }
 
-    public function doSth() {
+    public function renderBlocks() {
+        global $cpgtpl;
+
 
         // Test data
-        $id = 1;
-        $access = array(1,2,3);
-        $active = 1;
-        $title = 'Example Block';
-        $type = 1; //1-file, 2-custom
-        $file = 'Latest_Forum_Posts';
-        $custom = '';
-        $position = 'half';
-        $order = 1;
+        $blockInfo = array();
+        $blockInfo['id'] = 1;
+        $blockInfo['access'] = array(1,2,3);
+        $blockInfo['active'] = 1;
+        $blockInfo['title'] = 'Example Block';
+        $blockInfo['type'] = 0;
+        //$blockInfo['file'] = 'Latest_Forum_Posts';
+        $blockInfo['file'] = 'Example_Block';
 
-        if ($this->isType($type, 'file')) {
-            $filename = 'block-'.$file.'.php';
+        $blockInfo['custom'] = '';
+        $blockInfo['position'] = 'half';
+        $blockInfo['weight'] = 1;
+        $blocks = array();
+        $blocks[] = $blockInfo;
 
-            //todo: get $content value from blocks/$filename
-            $content = $filename;
-        } else if ($this->isType($type, 'custom')) {
-            //todo: secure it?
-            $content = $custom;
-        } else {
-            throw new AbstractBlocksException('unknown type: '.$type);
+
+
+        // This should run already in right order
+        foreach ($blocks as $advancedBlockInfo) {
+            try {
+                $abstractBlocksBlock = new AbstractBlocksBlock($advancedBlockInfo);
+                $abstractBlocksBlock->assignBlockVariables();
+            } catch (AbstractBlocksBlockException $blockException) {
+                //$blockException->...
+                echo $blockException;
+                echo 'something went wrong';
+            }
         }
 
-        new AdvancedBlocksBlock($title, $content, $position);
+        $cpgtpl->set_filenames(array('abstractblocks' => 'abstractblocks/abstractblocks.html'));
+        $cpgtpl->display('abstractblocks');
     }
-
-
-    private function isType($givenType, $wantedType) {
-        return $givenType == getType($wantedType);
-    }
-
-    private function getType($type) {
-        return key(self::$types[$type]);
-    }
-
-
 }
-
-

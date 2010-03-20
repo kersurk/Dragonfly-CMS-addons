@@ -23,11 +23,8 @@ require_once('AbstractBlocksModule.php');
 require_once('AbstractBlocksException.php');
 
 
-try {
-    $abstractBlocksModule = new AbstractBlocksModule();
-    $abstractBlocksModule->showHeader();
-    $abstractBlocksModule->showHello();
-//todo: some of it shouldn't be caught here, but separately for each blocks    
-} catch (AbstractBlocksException $abe) {
-    echo 'something went wrong';
-}
+$abstractBlocksModule = new AbstractBlocksModule();
+$abstractBlocksModule->showHeader();
+$abstractBlocksModule->showHello();
+
+$abstractBlocksModule->renderBlocks();
